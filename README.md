@@ -12,6 +12,9 @@ One of the pioneers working on the theory of ML is Prof. Naftali Tishby. In his 
 
 List of References:
 [1] "Opening the Black Box of Deep Neural Networks via Information" (2017), https://arxiv.org/abs/1703.00810
+
 [2] "The information bottleneck method" (2000), https://arxiv.org/abs/physics/0004057
+
 [3] "Information Theory of Deep Learning" [Berlin talk] (2017), https://www.youtube.com/watch?v=bLqJHjXihK8
+
 [4] "Information Theory of Deep Learning" [Moscow talk] (2017), https://www.youtube.com/watch?v=FSfN2K3tnJU
