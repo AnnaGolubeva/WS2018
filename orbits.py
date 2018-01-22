@@ -95,8 +95,6 @@ i=0
 for key in orbits.keys():
   dict_keyToLabel[key] = i
   i = i+1
-print dict_keyToLabel
-print N_orbits
 
 lst = list(product([0, 1], repeat=12))
 configs = np.array(lst)
@@ -137,8 +135,9 @@ for (ic,c) in enumerate(configs):
   #Find the label:
   labels[ic] = dict_keyToLabel[(n,key)]
 #end for
-print configs[1]
-print labels[1]
+
+print configs
+print labels
 
 #N = 2**12
 #px = 1.0/N
