@@ -30,8 +30,8 @@ def incr_key(d,k):
 orbits={}
 
 #Orbits with 0 or 12 points:
-orbits[(0,())]   = 1
-orbits[(12,())] = 12
+orbits[(0,())]  = 1
+orbits[(12,())] = 1
 
 #Orbits with 1 or 11 points:
 orbits[(1,(0))] = 12
@@ -88,13 +88,21 @@ for i1 in range(12):
                                                                                       dist[i5,i6]]) )
             incr_key(orbits,(6,key))
 
-#Now let's label the orbits:
+#Now let's label the orbits. Also, create the function f (random):
 N_orbits = len(orbits)
 dict_keyToLabel = {} #new dictionary with the same keys, but arguments are the labels
+f      = np.zeros(N_orbits)
+counts = np.zeros(N_orbits)
 i=0
 for key in orbits.keys():
   dict_keyToLabel[key] = i
+  
+  f[i]      = random.random()
+  counts[i] = orbits[key]
   i = i+1
+
+f = np.array(f)
+counts = np.array(counts)
 
 lst = list(product([0, 1], repeat=12))
 configs = np.array(lst)
@@ -134,49 +142,36 @@ def config_to_label(c):
   return dict_keyToLabel[(n,key)]
 #end config_to_label func
 
-#Loop over all configs to get all labels:
+def conf_to_str(c):
+  s = ''
+  for i in c:
+    s = s + str(i)
+  return s
+
+#Loop over all configs to get all labels and write to file:
+fout = open('config_labels.txt', 'w')
 for (ic,c) in enumerate(configs):
   labels[ic] = config_to_label(c)
+
+  fout.write('%s \t %d \n' %(conf_to_str(c),labels[ic]))
 #end for
+fout.close()
 
-print configs
-print labels
+N = 2**12
+px = 1.0/N
 
-#N = 2**12
-#px = 1.0/N
-#
-#f      = np.zeros(N_orbits)
-#counts = np.zeros(N_orbits)
-#for (i,key) in enumerate(orbits.keys()):
-#  #print key
-#  #print orbits[key]
-#  #print
-#  f[2*i]   = random.random()
-#  f[2*i+1] = random.random()
-#
-#  counts[2*i]   = orbits[key]
-#  counts[2*i+1] = orbits[key]
-#
-#for (i,key) in enumerate(orbits_6.keys()):
-#  f[2*len(orbits)+i] = random.random()
-#  counts[2*len(orbits)+i] = orbits_6[key]
-#f = np.array(f)
-#counts = np.array(counts)
-#
-#print np.sum(counts)
-#
-#random.seed(111)
-#theta = 0.5
-#gamma = 10
-#
-#print (f-theta)
-#
-#def psi(u,gam):
-#  return 1.0/ (1.0 + np.exp(-gam*u))
-#
-#configs = range(N)
-#p_ycondx = psi( f - theta, gamma )
-#p_y1 = px*np.sum(counts*p_ycondx)
-#
-#print 'p(y=1) = %f' %p_y1
-#print np.sum(counts)
+random.seed(111)
+theta = 0.5
+gamma = 10
+
+print (f-theta)
+
+def psi(u,gam):
+  return 1.0/ (1.0 + np.exp(-gam*u))
+
+configs = range(N)
+p_ycondx = psi( f - theta, gamma )
+p_y1 = px*np.sum(counts*p_ycondx)
+
+print 'p(y=1) = %f' %p_y1
+print np.sum(counts)
