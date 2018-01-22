@@ -100,14 +100,13 @@ lst = list(product([0, 1], repeat=12))
 configs = np.array(lst)
 labels  = np.zeros(len(configs))
 
-#Loop over all configs:
-for (ic,c) in enumerate(configs):
+def config_to_label(c):
   pts = [i for i in range(12) if c[i]==1]
   n = len(pts) #number of points
-
+  
   if n>6:
     pts = [i for i in range(12) if c[i]==0]
-
+  
   if n==0 or n==12:
     key = ()
   elif n==1 or n==11:
@@ -118,22 +117,26 @@ for (ic,c) in enumerate(configs):
     key = tuple( sorted([ dist[pts[0],pts[1]], dist[pts[0],pts[2]], dist[pts[1],pts[2]] ]) )
   elif n==4 or n==8:
     key = tuple( sorted([ dist[pts[0],pts[1]], dist[pts[0],pts[2]], dist[pts[0],pts[3]],
-                                               dist[pts[1],pts[2]], dist[pts[1],pts[3]],
-                                                                    dist[pts[2],pts[3]] ]) )
+                          dist[pts[1],pts[2]], dist[pts[1],pts[3]],
+                          dist[pts[2],pts[3]] ]) )
   elif n==5 or n==7:
     key = tuple( sorted([ dist[pts[0],pts[1]], dist[pts[0],pts[2]], dist[pts[0],pts[3]], dist[pts[0],pts[4]],
-                                               dist[pts[1],pts[2]], dist[pts[1],pts[3]], dist[pts[1],pts[4]],
-                                                                    dist[pts[2],pts[3]], dist[pts[2],pts[4]],
-                                                                                         dist[pts[3],pts[4]]]) )
+                          dist[pts[1],pts[2]], dist[pts[1],pts[3]], dist[pts[1],pts[4]],
+                          dist[pts[2],pts[3]], dist[pts[2],pts[4]],
+                          dist[pts[3],pts[4]]]) )
   else: #n=6
     key = tuple( sorted([ dist[pts[0],pts[1]], dist[pts[0],pts[2]], dist[pts[0],pts[3]], dist[pts[0],pts[4]], dist[pts[0],pts[5]],
-                                               dist[pts[1],pts[2]], dist[pts[1],pts[3]], dist[pts[1],pts[4]], dist[pts[1],pts[5]],
-                                                                    dist[pts[2],pts[3]], dist[pts[2],pts[4]], dist[pts[2],pts[5]],
-                                                                                         dist[pts[3],pts[4]], dist[pts[3],pts[5]],
-                                                                                                              dist[pts[4],pts[5]] ]) )
+                          dist[pts[1],pts[2]], dist[pts[1],pts[3]], dist[pts[1],pts[4]], dist[pts[1],pts[5]],
+                          dist[pts[2],pts[3]], dist[pts[2],pts[4]], dist[pts[2],pts[5]],
+                          dist[pts[3],pts[4]], dist[pts[3],pts[5]],
+                          dist[pts[4],pts[5]] ]) )
 
-  #Find the label:
-  labels[ic] = dict_keyToLabel[(n,key)]
+  return dict_keyToLabel[(n,key)]
+#end config_to_label func
+
+#Loop over all configs:
+for (ic,c) in enumerate(configs):
+  labels[ic] = config_to_label(c)
 #end for
 
 print configs
@@ -150,7 +153,7 @@ print labels
 #  #print
 #  f[2*i]   = random.random()
 #  f[2*i+1] = random.random()
-#  
+#
 #  counts[2*i]   = orbits[key]
 #  counts[2*i+1] = orbits[key]
 #
