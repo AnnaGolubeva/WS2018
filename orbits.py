@@ -88,7 +88,7 @@ for i1 in range(12):
                                                                                       dist[i5,i6]]) )
             incr_key(orbits,(6,key))
 
-#Now let's create an array that labels each configuration's orbit:
+#Now let's label the orbits:
 N_orbits = len(orbits)
 dict_keyToLabel = {} #new dictionary with the same keys, but arguments are the labels
 i=0
@@ -134,7 +134,7 @@ def config_to_label(c):
   return dict_keyToLabel[(n,key)]
 #end config_to_label func
 
-#Loop over all configs:
+#Loop over all configs to get all labels:
 for (ic,c) in enumerate(configs):
   labels[ic] = config_to_label(c)
 #end for
