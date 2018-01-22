@@ -5,6 +5,9 @@
 from   itertools import product
 import numpy as np
 import random
+from   scipy.optimize import fsolve
+
+random.seed(111)
 
 #       1 2 3 4 5 6 7 8 9 101112
 dist= [[0,2,1,2,1,2,1,2,1,2,1,3], #1
@@ -88,26 +91,19 @@ for i1 in range(12):
                                                                                       dist[i5,i6]]) )
             incr_key(orbits,(6,key))
 
-#Now let's label the orbits. Also, create the function f (random):
+#Now let's label the orbits. Also, create the function f:
 N_orbits = len(orbits)
 dict_keyToLabel = {} #new dictionary with the same keys, but arguments are the labels
-f      = np.zeros(N_orbits)
-counts = np.zeros(N_orbits)
 i=0
 for key in orbits.keys():
   dict_keyToLabel[key] = i
-  
-  f[i]      = random.random()
-  counts[i] = orbits[key]
   i = i+1
-
-f = np.array(f)
-counts = np.array(counts)
 
 lst = list(product([0, 1], repeat=12))
 configs = np.array(lst)
 labels  = np.zeros(len(configs))
 
+#Function to get the label corresponding to a given configuration:
 def config_to_label(c):
   pts = [i for i in range(12) if c[i]==1]
   n = len(pts) #number of points
@@ -142,6 +138,7 @@ def config_to_label(c):
   return dict_keyToLabel[(n,key)]
 #end config_to_label func
 
+#This function converts an input config. (array) to a string (for file output):
 def conf_to_str(c):
   s = ''
   for i in c:
@@ -152,7 +149,6 @@ def conf_to_str(c):
 fout = open('config_labels.txt', 'w')
 for (ic,c) in enumerate(configs):
   labels[ic] = config_to_label(c)
-
   fout.write('%s \t %d \n' %(conf_to_str(c),labels[ic]))
 #end for
 fout.close()
@@ -160,18 +156,44 @@ fout.close()
 N = 2**12
 px = 1.0/N
 
-random.seed(111)
-theta = 0.5
-gamma = 10
-
-print (f-theta)
-
 def psi(u,gam):
   return 1.0/ (1.0 + np.exp(-gam*u))
 
-configs = range(N)
-p_ycondx = psi( f - theta, gamma )
-p_y1 = px*np.sum(counts*p_ycondx)
+#Function that computes xlogx and gives 0 when x=0:
+def xlogx(x):
+  out = np.zeros(len(x))
+  
+  for i,xx in enumerate(x):
+    if xx>1e-100:
+     out[i] = xx*np.log2(xx)
+  return out
 
-print 'p(y=1) = %f' %p_y1
-print np.sum(counts)
+#Function that fsolve will call:
+def func((theta,gamma)):
+  p_y1condx = psi( labels - theta, gamma )
+  p_y0condx = 1.0 - p_y1condx
+  p_y1 = px*np.sum(p_y1condx)
+  
+  cutoff = 1e-10
+  p_y1 = min( p_y1, 1 - cutoff)
+  p_y1 = max( p_y1, cutoff )
+  
+  p_y0 = 1.0 - p_y1
+  
+  #print '%f  %f' %(theta, gamma)
+  
+  MI = px*( np.sum( xlogx(p_y1condx) ) - np.sum( p_y1condx*np.log2(p_y1) )
+          + np.sum( xlogx(p_y0condx) ) - np.sum( p_y0condx*np.log2(p_y0) ) )
+           
+  return [p_y1-0.5, (MI-0.99)*10]
+
+th,ga = fsolve(func,[34,10])
+out = func((th,ga))
+print "\nFrom Fsolve: (theta, gamma) = (%f, %f)" %(th, ga)
+print "p(y=1) = %f" %(out[0]+0.5)
+print "MI     = %f" %((out[1]/10)+0.99)
+
+print "\nAnna's solution: (theta, gamma) = (%f, %f)" %(34,30.5)
+out = func((34,30.5))
+print "p(y=1) = %f" %(out[0]+0.5)
+print "MI     = %f" %((out[1]/10)+0.99)
