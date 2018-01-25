@@ -31,7 +31,7 @@ train_confs = confs[indices_list[:train_samples]]
 train_labels = labels_hot[indices_list[:train_samples]]
 # Data for testing
 test_confs = confs[indices_list[train_samples:]]
-test_labels = labels[indices_list[train_samples:]]
+test_labels = labels_hot[indices_list[train_samples:]]
 
 ### Training Parameters ###
 # Given by user after you run
