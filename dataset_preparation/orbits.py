@@ -94,9 +94,11 @@ for i1 in range(12):
 #Now let's label the orbits. Also, create the function f:
 N_orbits = len(orbits)
 dict_keyToLabel = {} #new dictionary with the same keys, but arguments are the labels
+indices = range(N_orbits)
+np.random.shuffle(indices)
 i=0
 for key in orbits.keys():
-  dict_keyToLabel[key] = i
+  dict_keyToLabel[key] = indices[i]
   i = i+1
 
 lst = list(product([0, 1], repeat=12))
@@ -146,7 +148,7 @@ def conf_to_str(c):
   return s
 
 #Loop over all configs to get all labels and write to file:
-fout = open('config_labels.txt', 'w')
+fout = open('config_labels_random.txt', 'w')
 for (ic,c) in enumerate(configs):
   labels[ic] = config_to_label(c)
   fout.write('%s \t %d \n' %(conf_to_str(c),labels[ic]))
@@ -157,7 +159,7 @@ N = 2**12
 px = 1.0/N
 
 def psi(u,gam):
-  return 1.0/ (1.0 + np.exp(-gam*u))
+  return 1.0/ (1.0 + np.exp(np.minimum(-gam*u,700)))
 
 #Function that computes xlogx and gives 0 when x=0:
 def xlogx(x):
@@ -185,15 +187,15 @@ def func((theta,gamma)):
   MI = px*( np.sum( xlogx(p_y1condx) ) - np.sum( p_y1condx*np.log2(p_y1) )
           + np.sum( xlogx(p_y0condx) ) - np.sum( p_y0condx*np.log2(p_y0) ) )
            
-  return [p_y1-0.5, (MI-0.99)*10]
+  return [p_y1-0.5, (MI-0.99)]
 
-th,ga = fsolve(func,[34,10])
+th,ga = fsolve(func,[30,10])
 out = func((th,ga))
 print "\nFrom Fsolve: (theta, gamma) = (%f, %f)" %(th, ga)
 print "p(y=1) = %f" %(out[0]+0.5)
-print "MI     = %f" %((out[1]/10)+0.99)
+print "MI     = %f" %((out[1])+0.99)
 
 print "\nAnna's solution: (theta, gamma) = (%f, %f)" %(34,30.5)
 out = func((34,30.5))
 print "p(y=1) = %f" %(out[0]+0.5)
-print "MI     = %f" %((out[1]/10)+0.99)
+print "MI     = %f" %((out[1])+0.99)
