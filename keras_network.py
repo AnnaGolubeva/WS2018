@@ -70,19 +70,16 @@ def scheduler(epoch):
 
 ### Training ###
 # Train using SGD and cross-entropy as loss
-model.compile(optimizer=SGD(lr = learn_rate), loss='categorical_crossentropy')
+model.compile(optimizer=SGD(lr = learn_rate), loss='categorical_crossentropy', metrics=['accuracy'])
 callbacks=[History()] # Keras function to keep track of loss during training
 if decay_learning_rate: # (Optional: if we select to use decay)
     callbacks.append(LearningRateScheduler(scheduler))
 
-# Start training
 hist = model.fit(train_confs, train_labels, batch_size=batch_size, epochs=n_epoch, 
-                 verbose=0, callbacks=callbacks)
-loss = np.array(hist.history['loss']) # Save an array with loss for every epoch
+                 validation_data=(test_confs, test_labels), verbose=0, callbacks=callbacks)
 
-### Testing ###
-# Use trained network to predict labels for test data
-# (the argmax is to convert the continuous sigmoid output to 1D label of 0 or 1)
-pred_labels = np.argmax(model.predict(test_confs), axis=1)
-# Calculate accuracy from the number of correctly classified data
-accuracy = np.sum((pred_labels == test_labels).astype(np.int)) / test_samples
+# Metrics for every epoch
+loss = np.array(hist.history['loss'])
+test_loss = np.array(hist.history['val_loss'])
+accuracy = np.array(hist.history['acc'])
+test_accuracy = np.array(hist.history['val_acc'])
