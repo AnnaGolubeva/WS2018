@@ -8,7 +8,7 @@ import numpy as np
 import random
 import tensorflow as tf
 
-seed=1234
+seed=116
 np.random.seed(seed)
 random.seed(seed)
 tf.set_random_seed(seed)
@@ -73,9 +73,9 @@ for line in fin:
     y_data[count] = np.array([0,1.0])
   else:
     y_data[count] = np.array([1.0,0])
-    #num_y1 = num_y1 + 1
-  if step( fx - theta )[0] == 1:
-      num_y1 = num_y1 + 1
+    num_y1 = num_y1 + 1
+  #if step( fx - theta )[0] == 1:
+  #    num_y1 = num_y1 + 1
                       
   count = count + 1
 fin.close()
@@ -136,7 +136,7 @@ sess = tf.InteractiveSession()
 tf.global_variables_initializer().run()
 
 minibatch_size = 20 #N_train needs to be divisible by batch_size
-N_epochs = 10
+N_epochs = 25000
 permut = np.arange(N_train)
 
 ep_list    = []
