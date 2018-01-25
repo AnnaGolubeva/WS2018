@@ -8,6 +8,11 @@ import numpy as np
 import random
 import tensorflow as tf
 
+seed=116
+np.random.seed(seed)
+random.seed(seed)
+tf.set_random_seed(seed)
+
 plt.ion() #
 
 def step(u):
@@ -33,7 +38,7 @@ gamma = 30.5
 N_data=2**12
 n_neurons = [12,10,7,5,4,3,2]
 
-##ANNA'S CODE:
+##ANNA'S CODE FOR LABELLING:
 #x_data = np.load('toy_dataset/configs.npy')
 #y_data = [None for i in range(N_data)]
 #y_orig_data      = np.load('toy_dataset/labels.npy')
@@ -41,18 +46,19 @@ n_neurons = [12,10,7,5,4,3,2]
 ## convert labels into 1-hot representation
 ## y=0 --> (1,0)
 ## y=1 --> (0,1)
+#num_y1 = 0
 #for (i,yy) in enumerate(y_orig_data):
 #  if yy==0:
 #    y_data[i] = np.array([1.0,0])
 #  else:
 #    y_data[i] = np.array([0,1.0])
-#
-#y_data = np.array(y_data)
+#    num_y1 = num_y1 + 1
 
 x_data = np.zeros((N_data,n_neurons[0]))
 y_data = [None for i in range(N_data)]
-fin = open('configs_labels64.txt', 'r')
+fin = open('config_labels.txt', 'r')
 count = 0
+num_y1 = 0
 for line in fin:
   tokens = line.split()
   c_str = tokens[0]
@@ -67,14 +73,17 @@ for line in fin:
     y_data[count] = np.array([0,1.0])
   else:
     y_data[count] = np.array([1.0,0])
+    num_y1 = num_y1 + 1
+  #if step( fx - theta )[0] == 1:
+  #    num_y1 = num_y1 + 1
                       
   count = count + 1
 fin.close()
+
+print("Num with y = 1: %d out of %d" %(num_y1,len(y_data)))
 y_data = np.array(y_data)
         
 N_train = 3400
-np.random.seed(112)
-random.seed(112)
 train_indices = random.sample(range(N_data),N_train)
 test_indices = [ x for x in range(N_data) if x not in train_indices]
 
@@ -127,7 +136,7 @@ sess = tf.InteractiveSession()
 tf.global_variables_initializer().run()
 
 minibatch_size = 20 #N_train needs to be divisible by batch_size
-N_epochs = 100
+N_epochs = 25000
 permut = np.arange(N_train)
 
 ep_list    = []
@@ -148,7 +157,7 @@ for ep in range(N_epochs):
   ce_te_list.append(ce_te)
   ac_list.append(ac)
   
-  if ep%20==0:
+  if ep%50==0:
     print('\nepoch = %d' %(ep))
     print('  LR         = %f' %sess.run(learning_rate))
     print('  Cross ent. (train) = %f' %ce_tr)
@@ -168,7 +177,7 @@ for ep in range(N_epochs):
     plt.plot(ep_list,ce_te_list, label='Test')
     plt.xlabel("Epochs")
     plt.ylabel("Cross Entropy")
-    plt.legend()
+    plt.legend(loc='upper right')
     plt.pause(0.01)
 
   for k in range(0, N_train, minibatch_size):
@@ -181,10 +190,10 @@ print(sess.run(cross_entropy, feed_dict={x: x_test, y_: y_test}))
 print(sess.run(accuracy,      feed_dict={x: x_test, y_: y_test}))
 
 plt.figure(1)
-plt.savefig('accVsEpochs_sigmoidCE_%depochs_%.4fexpLR.pdf' %(N_epochs,starter_learning_rate))
+plt.savefig('accVsEpochs_sigmoidCE_%depochs_%.4fexpLR_%dseed.pdf' %(N_epochs,starter_learning_rate,seed))
 
 plt.figure(2)
-plt.savefig('ceVsEpochs_sigmoidCE_%depochs_%.4fexpLR.pdf' %(N_epochs,starter_learning_rate))
+plt.savefig('ceVsEpochs_sigmoidCE_%depochs_%.4fexpLR_%dseed.pdf' %(N_epochs,starter_learning_rate,seed))
 
 plt.show()
 
