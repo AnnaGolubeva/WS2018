@@ -29,8 +29,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   IB -- toy dataset
 \begin{center}
 {\bf\Large{Computing Mutual Information (MI)}}\\
-\vspace{5mm}
-(notes on subtask 2 from our project plan)
+%\vspace{5mm}
+%(notes on subtask 2 from our project plan)
 \end{center}
 \noindent\rule{\textwidth}{0.4pt}
 
@@ -63,7 +63,7 @@ The possible values of $t$ depend on the network architecture in two ways: The n
 
 The network architecture for the toy dataset is described in section 3 of the paper: ``up to'' 7 fully connected hidden layers, with 12-10-7-5-4-3-2 neurons, {\bf hyperbolic tangent} function as activation for all neurons except for the final layer, {\bf sigmoidal} activation for the final layer.
 
-For calculations on the MNIST dataset, the authors unfortunately does not specify any details. The only mention of it can be found in the paper on page 17: {\it ``[...] we examined the the SG statistics for a standard large problem (MNIST classification) and found the transition to the SGD diffusion phase.''} We assume for now that they use the standard architecture from the \href{https://www.tensorflow.org/get_started/mnist/beginners}{Tensorflow tutorial}.
+For calculations on the MNIST dataset, the authors unfortunately do not specify any details. The only mention of it can be found in the paper on page 17: {\it ``[...] we examined the the SG statistics for a standard large problem (MNIST classification) and found the transition to the SGD diffusion phase.''} We assume for now that they use the standard architecture from the \href{https://www.tensorflow.org/get_started/mnist/beginners}{Tensorflow tutorial}.
 
 
 \vspace{1cm}
@@ -81,7 +81,7 @@ p(x) = \frac{1}{4096} = const \equiv p_x.
 
 The outputs of each neuron are discretized by binning into 30 equal intervals between -1 and 1. These discretized values are used to directly calculate $P(X, T_i)$ and $P(T_i, Y) = \sum_x P(x,Y)P(T_i | x)$.
 
-For the following discussion we will slightly adjust the notation, using the following conventions: The input, label and each hidden layer are described by the randomvariables $X$, $Y$ and $T$, respectively, and the lower-case letters $x$, $y$ and $t$ denote the random variable, i.e. the possible configurations (of the input or the hidden layer) or the possible labels. The probability functions will be denoted by lower-case $p$.
+For the following discussion we will slightly adjust the notation, using the following conventions: The input, label and each hidden layer are described by the random variables $X$, $Y$ and $T$, respectively. The lower-case letters $x$, $y$ and $t$ denote the instances of the random variable, i.e. the possible configurations (of the input or the hidden layer) or the possible labels. The probability functions will be denoted by lower-case $p$.
 
 The MI between $X$ and $T$ is given by
 \begin{align}
@@ -91,25 +91,24 @@ Using the chain rule, the joint probability of $x$ and $t$ can be expressed thro
 \begin{equation}
 p(x,t) = p(t|x)p(x) = p(t|x) p_x.
 \end{equation}
-The number of all possible configurations of $T$ is $|T| = 30^n$, where $n$ is the number of units in the layer, and 30 is the number of possible values each unit can take, given by the number of bins. Given a network (fixed set of weights and biases), a configuration $x$ will be mapped to a representation $t$. Since $t$ is a coarsened representation of $x$, it is likely that several different configurations $x$ will be mapped onto the same representation $t$. However, the conditional probability for a representation $t$ given a configuration $x$ is either 0 or 1, i.e. a delta function:
+The number of all possible configurations of $T$ is $|T| = 30^n$, where $n$ is the number of units in the layer, and 30 is the number of possible values each unit can take, given by the number of bins. Given a network (fixed set of weights and biases, denoted collectively as $\omega$), a configuration $x$ will be mapped to a representation $t$. Since $t$ is a coarsened representation of $x$, it is likely that several different configurations $x$ will be mapped onto the same representation $t$. However, the conditional probability for a representation $t$ given a configuration $x$ is either 0 or 1, i.e. a delta function:
 \begin{equation}
 p(t|x) = \delta_{t,t^{(\omega)}_x}
 \end{equation}
-where $t^{(\omega)}_x$ denotes the representation $t$ for a given $x$ that is obtained from the network which is specified by a set of parameters $\omega$. To keep notation slim, $\omega$ will be omitted in the following. Therefore,
+where $t^{(\omega)}_x$ denotes the representation $t$ for a given $x$ that is obtained from the network which is specified by a set of parameters $\omega$. For the sake of readability, $\omega$ will be omitted in the following. With this, the MI can be expressed as
 \begin{align}
 I(X;T) &= \sum \limits_{x} \sum \limits_{t} p(t|x) p(x) \log\frac{p(t|x)p(x)}{p(x)p(t)}\\
    &= p_x \sum \limits_{x} \sum \limits_{t} \delta_{t,t_x} \log\frac{\delta_{t,t_x}}{p(t)}\\
    &= p_x \sum \limits_{x} \log\frac{1}{p(t_x)}\\
    &= - p_x \sum \limits_{x} \log p(t_x)   
 \end{align}
-
-Similarly,
+and
 \begin{align}
 I(T;Y) &= \sum \limits_{y} \sum \limits_{t} p(y,t) \log\frac{p(y,t)}{p(y)p(t)}\\
 &= \sum \limits_{y} \sum \limits_{t} \sum \limits_{x} p(x,y) p(t|x) \log\frac{ \sum \limits_{x'} p(x',y) p(t|x') }{p(y)p(t)}\\
 &= \sum \limits_{y} \sum \limits_{t} \sum \limits_{x} p(x,y) \delta_{t,t_x} \log\frac{ \sum \limits_{x'} p(x',y) \delta_{t,t_{x'}} }{p(y)p(t)}\\
 &= \sum \limits_{y} \sum \limits_{x} p(x,y) \log\frac{ \sum \limits_{x'} p(x',y) \delta_{t_x,t_{x'}} }{p(y)p(t_x)}\\
-&= p_x \sum \limits_{y} \sum \limits_{x} p(y|x) \log\frac{ p_x \sum \limits_{x'} p(y|x') \delta_{t_x,t_{x'}} }{p(y)p(t_x)} \label{eq:here}
+&= p_x \sum \limits_{y} \sum \limits_{x} p(y|x) \log\frac{ p_x \sum \limits_{x'} p(y|x') \delta_{t_x,t_{x'}} }{p(y)p(t_x)}. \label{eq:here}
 \end{align}
 
 Note that the remaining Kronecker delta in Eq.~\eqref{eq:here} restricts the sum in the argument of the log to only those configurations $x'$ with $t_{x'}=t_x$, where $x$ is set by the sum outside of the log.
@@ -119,41 +118,25 @@ The marginal probability of the label is
 \begin{equation}
 p(y) = \sum\limits_x p(y|x)p(x) = p_x \sum\limits_x p(y|x),
 \end{equation}
-the conditional probability for $y$ given $x$ was defined in the construction the toy dataset:
+and the conditional probability for $y$ given $x$ was defined in the construction of the toy dataset:
 \begin{equation}
 p(y=1|x) = \frac{1}{1+e^{-\gamma (f(x)-\theta)}},
 \end{equation}
 with parameters $\gamma = 30.5$ and $\theta=34$.
 
-Thus, the remaining quantity required to calculate the MIs is the marginal probability of a representation $t_x$ of a given $x$, $p(t_x)$. The representation $t_x$ is the output of the layer's units, binned in 30 equal intervals between $-1$ and $1$. For concreteness, consider the following example:
+Thus, the remaining quantity required to calculate the MIs is the marginal probability of a representation $t_x$ of a given $x$, $p(t_x)$. The representation $t_x$ is given by the outputs of the layer's units, each binned into 30 equal intervals between $-1$ and $1$. Let $n_T$ denote the number of units in the layer $T$. The output of this layer for a given configuration $x$ can be written as a vector of length $n_T$, it's elements being the bin numbers of each unit's output. The binning is effectively a rounding of the decimal outputs, performed to enable identification of equal representations. $p(t_x)$ for the given layer $T$ is obtained by collecting the $t_x$ for each $x$ and dividing the number of their occurences by the total number of configurations (which is 4096 for this dataset). Note that the order of the elements matters, i.e. $t_x = (14, 5, 27) \neq (27, 14, 5) = t_{x'}$.
 
-The hidden layer has 3 units. For a given configurations $x$, the output of the units is $(0.98, 0.97, -0.99)$. The first two values fall into the bin number 30, while the last value is in bin number 1. This result is saved as a list of tuples denoting the bin number and the bin count: $\{(1,1), (30,2)\}$.
+Notes on the algorithmic implementation in python (TensorFlow):
 
-This procedure is performed for each configuration $x$. The occuring configurations $t$ are recorded and counted.
+The representations $t_x~\forall~x$ are obtained by retrieving the network parameters in each epoch and calculating the network outputs for each configuration $x$ in the dataset. The binning is performed by the numpy function $digitize$, with bins defined through $linspace(-1,1,31)$. The numpy function $unique$ is used to remove duplicate $t$ from the array. It provides an array of unique elements $t$, ordered, as well as an array of indices 
 
-$p(t_x) = count of t_x / number of distinct t occured for all x$.
+%unique_elems, indices, counts = np.unique(t_vectors, return_counts=True, return_inverse=True, axis=0)
+%unique_elems # list of elements from input t_vectors, duplicates removed, ordered
+%counts # number of occurences for each element in the unique_elems
+%indices # indices of counts to each element in input t_vectors, i.e. "count of representation t_vectors[i]" = counts[indices[i]]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+The Kronecker delta in Eq.~\eqref{eq:here} is implemented as a correspondence matrix using the array indices. On the construction logic: For each $x$ given by the outside sum, we are interested in finding all $x'$ with the same representation, i.e. $t_{x'} = t_x$. Thus, for configuration $x=configs[k]$, the indices of all $x'$ fulfilling $t_{x'} = t_x$ can be obtained through $t_vectors==t_vectors[k]$. Note that this operation involves comparing vectors; there is a computationally cheaper operation which will yield the same result: $indices==indices[k]$.
+indices[k] holds the index for the correct element of the array count. The values in indices are the same for equal $t$.
 
 
 
