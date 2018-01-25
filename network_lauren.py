@@ -123,7 +123,6 @@ learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
                                            10000, 0.96, staircase=True)
 train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy,global_step=global_step)
 
-
 sess = tf.InteractiveSession()
 tf.global_variables_initializer().run()
 
@@ -181,5 +180,13 @@ print
 print(sess.run(cross_entropy, feed_dict={x: x_test, y_: y_test}))
 print(sess.run(accuracy,      feed_dict={x: x_test, y_: y_test}))
 
+plt.figure(1)
+plt.savefig('accVsEpochs_sigmoidCE_%depochs_%.4fexpLR.pdf' %(N_epochs,starter_learning_rate))
+
+plt.figure(2)
+plt.savefig('ceVsEpochs_sigmoidCE_%depochs_%.4fexpLR.pdf' %(N_epochs,starter_learning_rate))
+
 plt.show()
+
+
 
