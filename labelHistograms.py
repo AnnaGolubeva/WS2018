@@ -2,14 +2,8 @@
 #### Code by Lauren Hayward Sierens
 #####################################################################################
 
-from   itertools import product
+import matplotlib.pyplot as plt
 import numpy as np
-import random
-from   scipy.optimize import fsolve
-
-seed=111
-random.seed(seed)
-np.random.seed(seed)
 
 filename = 'config_labels_python2.txt'
 fin = open(filename, 'r')
@@ -33,9 +27,13 @@ def step(u):
 def psi(u,gam):
   return 1.0/ (1.0 + np.exp(np.minimum(-gam*u,700)))
 
-N_data=2**12
-x_data = np.zeros((N_data,12))
+N=12
+N_data=2**N
+x_data = np.zeros((N_data,N))
 y_data = [None for i in range(N_data)]
+hist_y0_data = []
+hist_y1_data = []
+
 count = 0
 num_y1 = 0
 for line in fin:
@@ -47,14 +45,33 @@ for line in fin:
   
   fx = int(tokens[1])
   y_data[count] = step( fx - theta )
-  if y_data[count][0] == 1:
-      num_y1 = num_y1 + 1
+  if y_data[count][0] == 0:
+    hist_y0_data.append(np.sum(x_data[count])-0.5)
+  else:
+    hist_y1_data.append(np.sum(x_data[count])-0.5)
+    num_y1 = num_y1 + 1
 
+  if np.sum(x_data[count]) == 12:
+    print(np.sum(x_data[count]))
   count = count + 1
 fin.close()
 
+hist_all     = hist_y0_data + hist_y1_data
+hist_y0_data = np.array(hist_y0_data)
+hist_y1_data = np.array(hist_y1_data)
+hist_all     = np.array(hist_all)
+
 print("Number with y=1: %d out of %d" %(num_y1,N_data))
+bins_arr = np.array(range(N+2))-0.5
 
+plt.hist(hist_all,    bins=bins_arr,color=(0.75,0.75,0.75), label='all configs.')
+plt.hist(hist_y0_data,bins=bins_arr, edgecolor='black',     label='y=0')
+plt.legend()
 
+plt.figure()
+plt.hist(hist_all,    bins=bins_arr,color=(0.75,0.75,0.75), label='all configs.')
+plt.hist(hist_y1_data,bins=bins_arr, edgecolor='black',     label='y=1')
+plt.legend()
 
+plt.show()
 
