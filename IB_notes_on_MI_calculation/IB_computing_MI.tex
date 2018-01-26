@@ -128,15 +128,17 @@ Thus, the remaining quantity required to calculate the MIs is the marginal proba
 
 Notes on the algorithmic implementation in python (TensorFlow):
 
-The representations $t_x~\forall~x$ are obtained by retrieving the network parameters in each epoch and calculating the network outputs for each configuration $x$ in the dataset. The binning is performed by the numpy function $digitize$, with bins defined through $linspace(-1,1,31)$. The numpy function $unique$ is used to remove duplicate $t$ from the array. It provides an array of unique elements $t$, ordered, as well as an array of indices 
+The representations $t_x~\forall~x$ are obtained by retrieving the network parameters in each epoch and calculating the network outputs for each configuration $x$ in the dataset. The binning is performed by the numpy function $\texttt{digitize}$, with bins defined through $\texttt{linspace(-1,1,31)}$. The numpy function $\texttt{unique}$ is used to remove duplicate $t$ from the array. It provides an array of unique elements $t$, ordered, as well as an array of indices 
 
 %unique_elems, indices, counts = np.unique(t_vectors, return_counts=True, return_inverse=True, axis=0)
 %unique_elems # list of elements from input t_vectors, duplicates removed, ordered
 %counts # number of occurences for each element in the unique_elems
 %indices # indices of counts to each element in input t_vectors, i.e. "count of representation t_vectors[i]" = counts[indices[i]]
 
-The Kronecker delta in Eq.~\eqref{eq:here} is implemented as a correspondence matrix using the array indices. On the construction logic: For each $x$ given by the outside sum, we are interested in finding all $x'$ with the same representation, i.e. $t_{x'} = t_x$. Thus, for configuration $x=configs[k]$, the indices of all $x'$ fulfilling $t_{x'} = t_x$ can be obtained through $t_vectors==t_vectors[k]$. Note that this operation involves comparing vectors; there is a computationally cheaper operation which will yield the same result: $indices==indices[k]$.
-indices[k] holds the index for the correct element of the array count. The values in indices are the same for equal $t$.
+The Kronecker delta in Eq.~\eqref{eq:here} is implemented as a correspondence matrix using the array indices. 
+On the construction logic: For each $x$ given by the outside sum, we are interested in finding all $x'$ with the same representation, i.e. $t_{x'} = t_x$. Thus, for configuration $\texttt{x=configs[k]}$, the indices of all $x'$ fulfilling $t_{x'} = t_x$ can be obtained through $\texttt{t}_{\texttt{vectors}}\texttt{==t}_{\texttt{vectors}}\texttt{[k]}$. Note that this operation involves comparing vectors; there is a computationally cheaper operation which will yield the same result: $\texttt{indices==indices[k]}$.
+$\texttt{indices[k]}$ holds the index for the correct element of the array count. 
+The values in indices are the same for equal $t$.
 
 
 
