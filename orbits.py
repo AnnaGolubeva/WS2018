@@ -7,7 +7,9 @@ import numpy as np
 import random
 from   scipy.optimize import fsolve
 
-random.seed(111)
+seed=111
+random.seed(seed)
+np.random.seed(seed)
 
 #       1 2 3 4 5 6 7 8 9 101112
 dist= [[0,2,1,2,1,2,1,2,1,2,1,3], #1
@@ -187,15 +189,22 @@ def func((theta,gamma)):
   MI = px*( np.sum( xlogx(p_y1condx) ) - np.sum( p_y1condx*np.log2(p_y1) )
           + np.sum( xlogx(p_y0condx) ) - np.sum( p_y0condx*np.log2(p_y0) ) )
            
-  return [p_y1-0.5, (MI-0.99)]
+  return [p_y1-0.5, (MI-0.99)*10]
 
 th,ga = fsolve(func,[30,10])
 out = func((th,ga))
 print "\nFrom Fsolve: (theta, gamma) = (%f, %f)" %(th, ga)
 print "p(y=1) = %f" %(out[0]+0.5)
-print "MI     = %f" %((out[1])+0.99)
+print "MI     = %f" %((out[1]/10)+0.99)
 
 print "\nAnna's solution: (theta, gamma) = (%f, %f)" %(34,30.5)
 out = func((34,30.5))
 print "p(y=1) = %f" %(out[0]+0.5)
-print "MI     = %f" %((out[1])+0.99)
+print "MI     = %f" %((out[1]/10)+0.99)
+
+t1 = 36.5
+g1 = 8
+print "\nManual solution: (theta, gamma) = (%f, %f)" %(t1,g1)
+out = func((t1,g1))
+print "p(y=1) = %f" %(out[0]+0.5)
+print "MI     = %f" %((out[1]/10)+0.99)

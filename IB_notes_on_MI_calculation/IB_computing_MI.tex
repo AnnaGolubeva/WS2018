@@ -76,7 +76,7 @@ In order to compute the MI, we need to estimate the probability distributions $p
 
 Since all configurations are equally probable, the distribution for $X$ is uniform:
 \begin{equation}
-p(x) = \frac{1}{4096} = const \equiv p_x.
+p(x) = \frac{1}{4096} = \text{const.} \equiv p_x.
 \end{equation}
 
 The outputs of each neuron are discretized by binning into 30 equal intervals between -1 and 1. These discretized values are used to directly calculate $P(X, T_i)$ and $P(T_i, Y) = \sum_x P(x,Y)P(T_i | x)$.
@@ -122,7 +122,7 @@ and the conditional probability for $y$ given $x$ was defined in the constructio
 \begin{equation}
 p(y=1|x) = \frac{1}{1+e^{-\gamma (f(x)-\theta)}},
 \end{equation}
-with parameters $\gamma = 30.5$ and $\theta=34$.
+with parameters $\gamma$ and $\theta$ that are tuned such that $p(y=1|x) \approx 0.5$ and $I(X;Y) \approx 0.99 \text{ bits}$.
 
 Thus, the remaining quantity required to calculate the MIs is the marginal probability of a representation $t_x$ of a given $x$, $p(t_x)$. The representation $t_x$ is given by the outputs of the layer's units, each binned into 30 equal intervals between $-1$ and $1$. Let $n_T$ denote the number of units in the layer $T$. The output of this layer for a given configuration $x$ can be written as a vector of length $n_T$, it's elements being the bin numbers of each unit's output. The binning is effectively a rounding of the decimal outputs, performed to enable identification of equal representations. $p(t_x)$ for the given layer $T$ is obtained by collecting the $t_x$ for each $x$ and dividing the number of their occurences by the total number of configurations (which is 4096 for this dataset). Note that the order of the elements matters, i.e. $t_x = (14, 5, 27) \neq (27, 14, 5) = t_{x'}$.
 

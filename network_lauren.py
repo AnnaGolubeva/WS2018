@@ -8,7 +8,7 @@ import numpy as np
 import random
 import tensorflow as tf
 
-seed=116
+seed=444
 np.random.seed(seed)
 random.seed(seed)
 tf.set_random_seed(seed)
@@ -135,14 +135,15 @@ train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_ent
 sess = tf.InteractiveSession()
 tf.global_variables_initializer().run()
 
-minibatch_size = 20 #N_train needs to be divisible by batch_size
-N_epochs = 25000
+minibatch_size = 100 #N_train needs to be divisible by batch_size
+N_epochs = 10000
 permut = np.arange(N_train)
 
 ep_list    = []
 ce_tr_list = []
 ce_te_list = []
-ac_list    = []
+ac_tr_list = []
+ac_te_list = []
 
 for ep in range(N_epochs):
   np.random.shuffle(permut)
@@ -150,25 +151,30 @@ for ep in range(N_epochs):
   labels  = y_train[permut,:]
   ce_tr = sess.run(cross_entropy, feed_dict={x: configs, y_: labels})
   ce_te = sess.run(cross_entropy, feed_dict={x: x_test, y_: y_test})
-  ac = sess.run(accuracy,      feed_dict={x: x_test, y_: y_test})
+  ac_tr = sess.run(accuracy,      feed_dict={x: configs, y_: labels})
+  ac_te = sess.run(accuracy,      feed_dict={x: x_test, y_: y_test})
   
   ep_list.append(ep)
   ce_tr_list.append(ce_tr)
   ce_te_list.append(ce_te)
-  ac_list.append(ac)
+  ac_tr_list.append(ac_tr)
+  ac_te_list.append(ac_te)
   
   if ep%50==0:
     print('\nepoch = %d' %(ep))
     print('  LR         = %f' %sess.run(learning_rate))
     print('  Cross ent. (train) = %f' %ce_tr)
     print('  Cross ent. (test)  = %f' %ce_te)
-    print('  Accuracy           = %f' %ac)
+    print('  Accuracy (train)   = %f' %ac_tr)
+    print('  Accuracy (test)    = %f' %ac_te)
     
     plt.figure(1)
     plt.clf()
-    plt.plot(ep_list,ac_list)
+    plt.plot(ep_list,ac_tr_list, label='Train')
+    plt.plot(ep_list,ac_te_list, label='Test')
     plt.xlabel("Epochs")
     plt.ylabel("Accuracy")
+    plt.legend(loc='upper right')
     plt.pause(0.01)
 
     plt.figure(2)
@@ -190,10 +196,10 @@ print(sess.run(cross_entropy, feed_dict={x: x_test, y_: y_test}))
 print(sess.run(accuracy,      feed_dict={x: x_test, y_: y_test}))
 
 plt.figure(1)
-plt.savefig('accVsEpochs_sigmoidCE_%depochs_%.4fexpLR_%dseed.pdf' %(N_epochs,starter_learning_rate,seed))
+plt.savefig('accVsEpochs_sigmoidCE_%depochs_%.4fexpLR_%dminibatch_%dseed.pdf' %(N_epochs,starter_learning_rate,minibatch_size,seed))
 
 plt.figure(2)
-plt.savefig('ceVsEpochs_sigmoidCE_%depochs_%.4fexpLR_%dseed.pdf' %(N_epochs,starter_learning_rate,seed))
+plt.savefig('ceVsEpochs_sigmoidCE_%depochs_%.4fexpLR_%dminibatch_%dseed.pdf' %(N_epochs,starter_learning_rate,minibatch_size,seed))
 
 plt.show()
 
