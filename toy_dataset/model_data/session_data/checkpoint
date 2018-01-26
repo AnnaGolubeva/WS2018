@@ -1,2 +1,2 @@
-model_checkpoint_path: "toy_network_model.ckpt"
-all_model_checkpoint_paths: "toy_network_model.ckpt"
+model_checkpoint_path: "toy_network_model_1.ckpt"
+all_model_checkpoint_paths: "toy_network_model_1.ckpt"
