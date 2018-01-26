@@ -97,7 +97,7 @@ for i1 in range(12):
 N_orbits = len(orbits)
 dict_keyToLabel = {} #new dictionary with the same keys, but arguments are the labels
 indices = range(N_orbits)
-np.random.shuffle(indices)
+#np.random.shuffle(indices)
 i=0
 for key in orbits.keys():
   dict_keyToLabel[key] = indices[i]
@@ -150,7 +150,7 @@ def conf_to_str(c):
   return s
 
 #Loop over all configs to get all labels and write to file:
-fout = open('config_labels_random.txt', 'w')
+fout = open('config_labels_python3.txt', 'w')
 for (ic,c) in enumerate(configs):
   labels[ic] = config_to_label(c)
   fout.write('%s \t %d \n' %(conf_to_str(c),labels[ic]))
@@ -173,7 +173,8 @@ def xlogx(x):
   return out
 
 #Function that fsolve will call:
-def func((theta,gamma)):
+def func(p):
+  (theta,gamma)=p
   p_y1condx = psi( labels - theta, gamma )
   p_y0condx = 1.0 - p_y1condx
   p_y1 = px*np.sum(p_y1condx)
@@ -193,18 +194,18 @@ def func((theta,gamma)):
 
 th,ga = fsolve(func,[30,10])
 out = func((th,ga))
-print "\nFrom Fsolve: (theta, gamma) = (%f, %f)" %(th, ga)
-print "p(y=1) = %f" %(out[0]+0.5)
-print "MI     = %f" %((out[1]/10)+0.99)
+print("\nFrom Fsolve: (theta, gamma) = (%f, %f)" %(th, ga))
+print("p(y=1) = %f" %(out[0]+0.5))
+print("MI     = %f" %((out[1]/10)+0.99))
 
-print "\nAnna's solution: (theta, gamma) = (%f, %f)" %(34,30.5)
+print("\nAnna's solution: (theta, gamma) = (%f, %f)" %(34,30.5))
 out = func((34,30.5))
-print "p(y=1) = %f" %(out[0]+0.5)
-print "MI     = %f" %((out[1]/10)+0.99)
+print("p(y=1) = %f" %(out[0]+0.5))
+print("MI     = %f" %((out[1]/10)+0.99))
 
-t1 = 36.5
-g1 = 8
-print "\nManual solution: (theta, gamma) = (%f, %f)" %(t1,g1)
+t1 = 39.1
+g1 = 30
+print("\nManual solution: (theta, gamma) = (%f, %f)" %(t1,g1))
 out = func((t1,g1))
-print "p(y=1) = %f" %(out[0]+0.5)
-print "MI     = %f" %((out[1]/10)+0.99)
+print("p(y=1) = %f" %(out[0]+0.5))
+print("MI     = %f" %((out[1]/10)+0.99))
