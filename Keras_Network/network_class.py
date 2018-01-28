@@ -16,7 +16,7 @@ import network_utilities as nf
 import dataset_functions as df
 from mi_functions import MI_class
 from keras.optimizers import SGD
-from keras.models import save_model, load_model
+from keras.models import load_model
 import matplotlib.pyplot as plt    
 
 class MI_New_Model():
